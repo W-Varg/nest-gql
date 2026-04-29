@@ -1,0 +1,125 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateDepartamentoInput {
+  capital: String
+  nombre: String!
+  paisId: Int!
+}
+
+input CreateMunicipioInput {
+  nombre: String!
+  provinciaId: Int!
+}
+
+input CreatePaisInput {
+  codigoIso: String
+  nombre: String!
+}
+
+input CreateProvinciaInput {
+  departamentoId: Int!
+  nombre: String!
+}
+
+type Departamento {
+  capital: String
+  id: Int!
+
+  """
+  Todos los municipios pertenecientes a este departamento (atraviesa provincias internamente).
+  """
+  municipios: [Municipio!]!
+  nombre: String!
+
+  """
+  País al que pertenece el departamento — resuelto vía DataLoader (batched).
+  """
+  pais: Pais!
+  paisId: Int!
+}
+
+type Municipio {
+  id: Int!
+  nombre: String!
+
+  """
+  Provincia a la que pertenece el municipio — resuelto vía DataLoader (batched).
+  """
+  provincia: Provincia!
+  provinciaId: Int!
+}
+
+type Mutation {
+  createDepartamento(createDepartamentoInput: CreateDepartamentoInput!): Departamento!
+  createMunicipio(createMunicipioInput: CreateMunicipioInput!): Municipio!
+  createPais(createPaisInput: CreatePaisInput!): Pais!
+  createProvincia(createProvinciaInput: CreateProvinciaInput!): Provincia!
+  removeDepartamento(id: Int!): Departamento!
+  removeMunicipio(id: Int!): Municipio!
+  removePais(id: Int!): Pais!
+  removeProvincia(id: Int!): Provincia!
+  updateDepartamento(updateDepartamentoInput: UpdateDepartamentoInput!): Departamento!
+  updateMunicipio(updateMunicipioInput: UpdateMunicipioInput!): Municipio!
+  updatePais(updatePaisInput: UpdatePaisInput!): Pais!
+  updateProvincia(updateProvinciaInput: UpdateProvinciaInput!): Provincia!
+}
+
+type Pais {
+  codigoIso: String
+
+  """Departamentos pertenecientes a este país (relación 1:N)."""
+  departamentos: [Departamento!]!
+  id: Int!
+  nombre: String!
+}
+
+type Provincia {
+  """
+  Departamento al que pertenece la provincia — resuelto vía DataLoader (batched).
+  """
+  departamento: Departamento!
+  departamentoId: Int!
+  id: Int!
+  nombre: String!
+}
+
+type Query {
+  departamento(id: Int!): Departamento!
+  departamentos: [Departamento!]!
+  departamentosPorPais(paisId: Int!): [Departamento!]!
+  municipio(id: Int!): Municipio!
+  municipios: [Municipio!]!
+  municipiosPorProvincia(provinciaId: Int!): [Municipio!]!
+  pais(id: Int!): Pais!
+  paises: [Pais!]!
+  provincia(id: Int!): Provincia!
+  provincias: [Provincia!]!
+  provinciasPorDepartamento(departamentoId: Int!): [Provincia!]!
+}
+
+input UpdateDepartamentoInput {
+  capital: String
+  id: Int!
+  nombre: String
+  paisId: Int
+}
+
+input UpdateMunicipioInput {
+  id: Int!
+  nombre: String
+  provinciaId: Int
+}
+
+input UpdatePaisInput {
+  codigoIso: String
+  id: Int!
+  nombre: String
+}
+
+input UpdateProvinciaInput {
+  departamentoId: Int
+  id: Int!
+  nombre: String
+}

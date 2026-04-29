@@ -33,6 +33,11 @@ export class MunicipioService {
     return this.items.filter((m) => m.provinciaId === provinciaId);
   }
 
+  findByProvinciaIds(provinciaIds: readonly number[]): Municipio[] {
+    const set = new Set(provinciaIds);
+    return this.items.filter((m) => set.has(m.provinciaId));
+  }
+
   update(id: number, input: UpdateMunicipioInput): Municipio {
     const m = this.findOne(id);
     Object.assign(m, input);

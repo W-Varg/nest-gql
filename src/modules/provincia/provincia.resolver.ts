@@ -1,12 +1,17 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { ProvinciaService } from './provincia.service';
 import { Provincia } from './entities/provincia.entity';
 import { CreateProvinciaInput } from './dto/create-provincia.input';
 import { UpdateProvinciaInput } from './dto/update-provincia.input';
+import { Departamento } from '../departamento/entities/departamento.entity';
+import { DepartamentoLoader } from '../departamento/departamento.loader';
 
 @Resolver(() => Provincia)
 export class ProvinciaResolver {
-  constructor(private readonly provinciaService: ProvinciaService) {}
+  constructor(
+    private readonly provinciaService: ProvinciaService,
+    private readonly departamentoLoader: DepartamentoLoader,
+  ) {}
 
   @Mutation(() => Provincia)
   createProvincia(@Args('createProvinciaInput') createProvinciaInput: CreateProvinciaInput) {
@@ -36,5 +41,12 @@ export class ProvinciaResolver {
   @Mutation(() => Provincia)
   removeProvincia(@Args('id', { type: () => Int }) id: number) {
     return this.provinciaService.remove(id);
+  }
+
+  @ResolveField(() => Departamento, {
+    description: 'Departamento al que pertenece la provincia — resuelto vía DataLoader (batched).',
+  })
+  departamento(@Parent() provincia: Provincia) {
+    return this.departamentoLoader.byId.load(provincia.departamentoId);
   }
 }

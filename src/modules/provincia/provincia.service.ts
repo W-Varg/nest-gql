@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Provincia } from './entities/provincia.entity';
 import { CreateProvinciaInput } from './dto/create-provincia.input';
 import { UpdateProvinciaInput } from './dto/update-provincia.input';
 
 @Injectable()
 export class ProvinciaService {
+  private readonly logger = new Logger(ProvinciaService.name);
   private items: Provincia[] = [
     { id: 1, nombre: 'Murillo', departamentoId: 1 },
     { id: 2, nombre: 'Pedro Domingo Murillo', departamentoId: 1 },
@@ -30,9 +31,16 @@ export class ProvinciaService {
   }
 
   findOne(id: number): Provincia {
+    this.logger.log(`findOne(${id})`);
     const p = this.items.find((x) => x.id === id);
     if (!p) throw new NotFoundException(`Provincia #${id} no encontrada`);
     return p;
+  }
+
+  findByIds(ids: readonly number[]): Provincia[] {
+    this.logger.log(`findByIds([${ids.join(',')}]) (1 batched call for ${ids.length} ids)`);
+    const set = new Set(ids);
+    return this.items.filter((p) => set.has(p.id));
   }
 
   findByDepartamento(departamentoId: number): Provincia[] {

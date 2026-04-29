@@ -1,12 +1,17 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { DepartamentoService } from './departamento.service';
 import { Departamento } from './entities/departamento.entity';
 import { CreateDepartamentoInput } from './dto/create-departamento.input';
 import { UpdateDepartamentoInput } from './dto/update-departamento.input';
+import { Pais } from '../pais/entities/pais.entity';
+import { PaisLoader } from '../pais/pais.loader';
 
 @Resolver(() => Departamento)
 export class DepartamentoResolver {
-  constructor(private readonly departamentoService: DepartamentoService) {}
+  constructor(
+    private readonly departamentoService: DepartamentoService,
+    private readonly paisLoader: PaisLoader,
+  ) {}
 
   @Mutation(() => Departamento)
   createDepartamento(
@@ -40,5 +45,12 @@ export class DepartamentoResolver {
   @Mutation(() => Departamento)
   removeDepartamento(@Args('id', { type: () => Int }) id: number) {
     return this.departamentoService.remove(id);
+  }
+
+  @ResolveField(() => Pais, {
+    description: 'País al que pertenece el departamento — resuelto vía DataLoader (batched).',
+  })
+  pais(@Parent() departamento: Departamento) {
+    return this.paisLoader.byId.load(departamento.paisId);
   }
 }

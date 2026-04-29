@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Departamento } from './entities/departamento.entity';
 import { CreateDepartamentoInput } from './dto/create-departamento.input';
 import { UpdateDepartamentoInput } from './dto/update-departamento.input';
 
 @Injectable()
 export class DepartamentoService {
+  private readonly logger = new Logger(DepartamentoService.name);
   private items: Departamento[] = [
     { id: 1, nombre: 'La Paz', capital: 'La Paz', paisId: 1 },
     { id: 2, nombre: 'Cochabamba', capital: 'Cochabamba', paisId: 1 },
@@ -29,9 +30,16 @@ export class DepartamentoService {
   }
 
   findOne(id: number): Departamento {
+    this.logger.log(`findOne(${id})`);
     const dep = this.items.find((d) => d.id === id);
     if (!dep) throw new NotFoundException(`Departamento #${id} no encontrado`);
     return dep;
+  }
+
+  findByIds(ids: readonly number[]): Departamento[] {
+    this.logger.log(`findByIds([${ids.join(',')}]) (1 batched call for ${ids.length} ids)`);
+    const set = new Set(ids);
+    return this.items.filter((d) => set.has(d.id));
   }
 
   findByPais(paisId: number): Departamento[] {
